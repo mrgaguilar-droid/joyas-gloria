@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gloria F. - Accesorios y Joyas</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 text-gray-800 font-sans min-h-screen flex flex-col justify-between">
+
+    <!-- ENCABEZADO -->
+    <header class="bg-white shadow-sm sticky top-0 z-50">
+        <div class="max-w-6xl mx-auto px-4 py-4 flex justify-between items-center">
+            <h1 class="text-xl font-bold tracking-wider uppercase">Gloria F. <span class="text-xs font-normal text-gray-500 block sm:inline">Elegancia y Estilo </span></h1>
+        </div>
+    </header>
+
+    <!-- CONTENIDO PRINCIPAL -->
+    <main class="max-w-6xl mx-auto px-4 py-8 flex-grow w-full">
+        
+        <!-- BANNER / BIENVENIDA -->
+        <div class="text-center mb-10">
+            <h2 class="text-3xl font-light mb-2">Colección Exclusiva</h2>
+            <p class="text-gray-500 text-sm max-w-md mx-auto">Encuentra los accesorios perfectos para realzar tu estilo todos los días.</p>
+        </div>
+
+        <!-- FILTRO DE CATEGORÍAS (Opcional) -->
+        <div id="categorias-container" class="flex justify-center flex-wrap gap-2 mb-8">
+            <button onclick="filtrarCategoria('TODAS')" class="cat-btn bg-black text-white text-xs px-4 py-1.5 rounded-full transition">Todas</button>
+            <!-- Las categorías se cargarán solas -->
+        </div>
+
+        <!-- CATÁLOGO DE JOYAS -->
+        <div id="catalogo-joyas" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            <!-- Cargando -->
+            <div class="col-span-full text-center py-12 text-gray-400">
+                <p>Cargando catálogo de joyas...</p>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- PIE DE PÁGINA -->
+    <footer class="bg-white border-t mt-12 py-6 text-center text-xs text-gray-500">
+        <p>&copy; 2026 Gloria F. Todos los derechos reservados.</p>
+    </footer>
+
+    <script>
+        // PEGA AQUÍ LA MISMA URL DE LA APLICACIÓN WEB DE GOOGLE APPS SCRIPT
+        const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbxLwRP_SQTOxdgZNPgXQxowDcoz_3dJ2DGUTpjxiki-Zuc69LuuUwsy5Jp4c0a5HmP_TQ/exec';
+
+        let todasLasJoyas = [];
+
+        window.addEventListener('DOMContentLoaded', () => {
+            cargarCatalogoCliente();
+        });
+
+        async function cargarCatalogoCliente() {
+            const contenedor = document.getElementById('catalogo-joyas');
+            
+            try {
+                const response = await fetch(WEB_APP_URL);
+                const data = await response.json();
+                
+                todasLasJoyas = data;
+
+                if (!data || data.length === 0) {
+                    contenedor.innerHTML = `<div class="col-span-full text-center py-12 text-gray-500">No hay joyas disponibles en este momento. Vuelve pronto.</div>`;
+                    return;
+                }
+
+                renderizarJoyas(data);
+                generarBotonesCategorias(data);
+
+            } catch (err) {
+                contenedor.innerHTML = `<div class="col-span-full text-center py-12 text-red-500">Error al cargar el catálogo. Intenta recargar la página.</div>`;
+            }
+        }
+
+        function renderizarJoyas(joyas) {
+            const contenedor = document.getElementById('catalogo-joyas');
+
+            contenedor.innerHTML = joyas.map(joya => `
+                <div class="bg-white rounded-xl shadow-sm border overflow-hidden flex flex-col justify-between transition hover:shadow-md">
+                    <div>
+                        <div class="relative h-64 bg-gray-100 overflow-hidden">
+                            <img src="${joya.imagen_url || 'https://via.placeholder.com/300'}" alt="${joya.nombre}" class="w-full h-full object-cover object-center">
+                            ${!joya.disponible ? '<span class="absolute top-2 right-2 bg-red-500 text-white text-[10px] uppercase font-bold px-2 py-0.5 rounded">Agotado</span>' : ''}
+                        </div>
+                        <div class="p-4">
+                            <div class="text-[10px] uppercase tracking-wider text-gray-400 font-semibold mb-1">${joya.categoria || 'Accesorio'}</div>
+                            <h3 class="font-medium text-gray-800 text-base mb-1">${joya.nombre}</h3>
+                            <div class="text-lg font-bold text-black mb-2">$${Number(joya.precio).toFixed(2)}</div>
+                        </div>
+                    </div>
+                    <div class="p-4 pt-0">
+                        <a href="https://wa.me/50379630272?text=${encodeURIComponent('Hola, me interesa la joya ' + joya.nombre + ' (' + joya.codigo + ') con precio de $' + joya.precio)}" target="_blank" class="block w-full text-center bg-black text-white py-2 rounded-lg text-xs font-medium hover:bg-gray-800 transition">
+                            Consultar / Comprar
+                        </a>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function generarBotonesCategorias(joyas) {
+            const categoriasUnicas = ['TODAS', ...new Set(joyas.map(j => j.categoria).filter(Boolean))];
+            const container = document.getElementById('categorias-container');
+            
+            container.innerHTML = categoriasUnicas.map(cat => `
+                <button onclick="filtrarCategoria('${cat}')" class="cat-btn text-xs px-4 py-1.5 rounded-full transition border ${cat === 'TODAS' ? 'bg-black text-white border-black' : 'bg-white text-gray-700 border-gray-200 hover:bg-gray-100'}">
+                    ${cat}
+                </button>
+            `).join('');
+        }
+
+        function filtrarCategoria(categoria) {
+            const botones = document.querySelectorAll('.cat-btn');
+            botones.forEach(btn => {
+                if(btn.textContent.trim() === categoria) {
+                    btn.className = "cat-btn text-xs px-4 py-1.5 rounded-full transition border bg-black text-white border-black";
+                } else {
+                    btn.className = "cat-btn text-xs px-4 py-1.5 rounded-full transition border bg-white text-gray-700 border-gray-200 hover:bg-gray-100";
+                }
+            });
+
+            if (categoria === 'TODAS') {
+                renderizarJoyas(todasLasJoyas);
+            } else {
+                const filtradas = todasLasJoyas.filter(j => j.categoria === categoria);
+                renderizarJoyas(filtradas);
+            }
+        }
+    </script>
+</body>
+</html>
