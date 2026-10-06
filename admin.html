@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel de Administración - Gloria F.</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 font-sans min-h-screen flex flex-col justify-between">
+
+    <!-- PANTALLA DE LOGIN -->
+    <div id="login-screen" class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-xl max-w-sm w-full p-8">
+            <div class="text-center mb-6">
+                <h2 class="text-2xl font-bold">Administración</h2>
+                <p class="text-xs text-gray-500 mt-1">Ingresa tus credenciales para continuar</p>
+            </div>
+            <form id="login-form" onsubmit="handleLogin(event)" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-medium text-gray-700 mb-1">Correo Electrónico</label>
+                    <input type="email" id="login-email" required class="w-full px-3 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-black">
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-gray-700 mb-1">Contraseña</label>
+                    <input type="password" id="login-pass" required class="w-full px-3 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-black">
+                </div>
+                <button type="submit" class="w-full bg-black text-white py-2.5 rounded-lg text-sm font-medium hover:bg-gray-800 transition">Entrar al Panel</button>
+                <div id="login-error" class="text-red-500 text-xs text-center hidden">Correo o contraseña incorrectos</div>
+            </form>
+        </div>
+    </div>
+
+    <!-- PANEL DE ADMINISTRACIÓN -->
+    <div id="admin-panel" class="hidden flex-grow flex flex-col">
+        <header class="bg-white shadow-sm">
+            <div class="max-w-5xl mx-auto px-4 py-4 flex justify-between items-center">
+                <h1 class="font-bold text-lg">Panel de Joyas - Gloria F.</h1>
+                <div class="flex items-center gap-4">
+                    
+                    <button onclick="cerrarSesion()" class="text-xs bg-gray-200 px-3 py-1.5 rounded-md hover:bg-gray-300 font-medium">Cerrar Sesión</button>
+                </div>
+            </div>
+        </header>
+
+        <main class="max-w-5xl mx-auto px-4 py-8 flex-grow w-full space-y-8">
+            
+            <!-- FORMULARIO DE REGISTRO -->
+            <div class="bg-white rounded-xl shadow-sm border p-6 md:p-8">
+                <h2 class="text-xl font-bold mb-6">Registrar Nueva Joya</h2>
+                
+                <form id="joya-form" onsubmit="guardarJoya(event)" class="space-y-4">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-medium text-gray-700 mb-1">Código de la Joya</label>
+                            <input type="text" id="codigo" required placeholder="Ej. PUL-01" class="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-black focus:outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-gray-700 mb-1">Nombre de la Joya</label>
+                            <input type="text" id="nombre" required placeholder="Ej. Pulsera de corazones" class="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-black focus:outline-none">
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-medium text-gray-700 mb-1">Precio ($)</label>
+                            <input type="number" step="0.01" id="precio" required placeholder="7.00" class="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-black focus:outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-gray-700 mb-1">Categoría</label>
+                            <input type="text" id="categoria" required placeholder="Ej. Pulseras, Anillos, Collares" class="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-black focus:outline-none">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-medium text-gray-700 mb-1">Fotografía de la Joya</label>
+                        <input type="file" id="imagen" accept="image/*" required class="w-full text-xs text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-black file:text-white hover:file:bg-gray-800">
+                    </div>
+
+                    <div class="flex items-center gap-2 pt-2">
+                        <input type="checkbox" id="disponible" checked class="w-4 h-4 accent-black">
+                        <label for="disponible" class="text-sm text-gray-700">Disponible para la venta</label>
+                    </div>
+
+                    <button type="submit" id="btn-guardar" class="w-full bg-black text-white py-3 rounded-lg text-sm font-medium hover:bg-gray-800 transition">
+                        Guardar Joya en el Sistema
+                    </button>
+                </form>
+            </div>
+
+            <!-- LISTADO DE JOYAS REGISTRADAS -->
+            <div class="bg-white rounded-xl shadow-sm border p-6 md:p-8">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-xl font-bold">Joyas Registradas en el Sistema</h2>
+                    <button onclick="cargarJoyasAdmin()" class="text-xs bg-gray-100 border px-3 py-1.5 rounded-md hover:bg-gray-200 transition">Actualizar Lista</button>
+                </div>
+
+                <div id="lista-joyas-admin" class="space-y-4">
+                    <p class="text-sm text-gray-400 text-center py-6">Cargando joyas registradas...</p>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <footer class="bg-white border-t py-4 text-center text-xs text-gray-500 mt-12">
+        <p>&copy; 2026 Gloria F. Panel de Administración.</p>
+    </footer>
+
+    <script>
+        // PEGA AQUÍ TU URL DE GOOGLE APPS SCRIPT
+        const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbxLwRP_SQTOxdgZNPgXQxowDcoz_3dJ2DGUTpjxiki-Zuc69LuuUwsy5Jp4c0a5HmP_TQ/exec';
+
+        const ADMIN_EMAIL = "xiniadeteresita@gmail.com";
+        const ADMIN_PASS = "joyas123";
+
+        window.addEventListener('DOMContentLoaded', () => {
+            if (localStorage.getItem('admin_logueado') === 'true') {
+                mostrarPanel();
+            }
+        });
+
+        function handleLogin(e) {
+            e.preventDefault();
+            const email = document.getElementById('login-email').value;
+            const pass = document.getElementById('login-pass').value;
+
+            if (email === ADMIN_EMAIL && pass === ADMIN_PASS) {
+                localStorage.setItem('admin_logueado', 'true');
+                mostrarPanel();
+            } else {
+                document.getElementById('login-error').classList.remove('hidden');
+            }
+        }
+
+        function mostrarPanel() {
+            document.getElementById('login-screen').classList.add('hidden');
+            document.getElementById('admin-panel').classList.remove('hidden');
+            cargarJoyasAdmin();
+        }
+
+        function cerrarSesion() {
+            localStorage.removeItem('admin_logueado');
+            location.reload();
+        }
+
+        async function cargarJoyasAdmin() {
+            const contenedor = document.getElementById('lista-joyas-admin');
+            contenedor.innerHTML = `<p class="text-sm text-gray-400 text-center py-6">Cargando joyas registradas...</p>`;
+
+            try {
+                const response = await fetch(WEB_APP_URL);
+                const data = await response.json();
+
+                if (!data || data.length === 0) {
+                    contenedor.innerHTML = `<p class="text-sm text-gray-500 text-center py-6">No hay joyas registradas todavía.</p>`;
+                    return;
+                }
+
+                contenedor.innerHTML = data.map(joya => `
+                    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between border p-4 rounded-xl gap-4 bg-gray-50/50">
+                        <div class="flex items-center gap-4">
+                            <img src="${joya.imagen_url || 'https://via.placeholder.com/100'}" alt="${joya.nombre}" class="w-16 h-16 object-cover rounded-lg border bg-white flex-shrink-0">
+                            <div>
+                                <span class="bg-gray-200 text-gray-800 text-[10px] font-bold px-2 py-0.5 rounded">${joya.codigo}</span>
+                                <h3 class="font-bold text-gray-800 text-sm mt-1">${joya.nombre}</h3>
+                                <p class="text-xs text-gray-500">${joya.categoria || 'Sin categoría'} &bull; <span class="font-semibold text-black">$${Number(joya.precio).toFixed(2)}</span></p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-3 w-full sm:w-auto justify-between sm:justify-end border-t sm:border-t-0 pt-3 sm:pt-0">
+                            <span class="text-xs px-2.5 py-1 rounded-full font-medium ${joya.disponible ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}">
+                                ${joya.disponible ? 'Disponible' : 'Agotado'}
+                            </span>
+                            <button onclick="cambiarEstado('${joya.id}', ${!joya.disponible})" class="text-xs px-3 py-1.5 rounded-lg border bg-white hover:bg-gray-100 font-medium transition">
+                                ${joya.disponible ? 'Marcar Agotado' : 'Marcar Disponible'}
+                            </button>
+                        </div>
+                    </div>
+                `).join('');
+
+            } catch (err) {
+                contenedor.innerHTML = `<p class="text-sm text-red-500 text-center py-6">Error al cargar las joyas registradas.</p>`;
+            }
+        }
+
+        async function cambiarEstado(idJoya, nuevoEstado) {
+            try {
+                await fetch(WEB_APP_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                    body: JSON.stringify({
+                        accion: "cambiar_disponibilidad",
+                        id: idJoya,
+                        disponible: nuevoEstado
+                    })
+                });
+
+                // Esperamos un momento a que Google Sheet guarde y refrescamos la lista
+                setTimeout(() => {
+                    cargarJoyasAdmin();
+                }, 1500);
+
+            } catch (error) {
+                alert("Error al actualizar la disponibilidad.");
+            }
+        }
+
+        async function guardarJoya(e) {
+            e.preventDefault();
+            
+            const btn = document.getElementById('btn-guardar');
+            btn.textContent = "Guardando joya y subiendo foto...";
+            btn.disabled = true;
+
+            const codigo = document.getElementById('codigo').value;
+            const nombre = document.getElementById('nombre').value;
+            const precio = document.getElementById('precio').value;
+            const categoria = document.getElementById('categoria').value;
+            const disponible = document.getElementById('disponible').checked;
+            const fileInput = document.getElementById('imagen').files[0];
+
+            if (!fileInput) {
+                alert("Por favor selecciona una imagen.");
+                btn.textContent = "Guardar Joya en el Sistema";
+                btn.disabled = false;
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.readAsDataURL(fileInput);
+            reader.onload = async function () {
+                const base64Data = reader.result;
+
+                const datosJoya = {
+                    codigo: codigo,
+                    nombre: nombre,
+                    precio: precio,
+                    categoria: categoria,
+                    disponible: disponible,
+                    imagenBase64: base64Data,
+                    imagenNombre: fileInput.name
+                };
+
+                try {
+                    await fetch(WEB_APP_URL, {
+                        method: 'POST',
+                        mode: 'no-cors',
+                        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                        body: JSON.stringify(datosJoya)
+                    });
+
+                    alert("¡Joya guardada con éxito!");
+                    document.getElementById('joya-form').reset();
+                    
+                    setTimeout(() => {
+                        cargarJoyasAdmin();
+                    }, 2000);
+
+                } catch (error) {
+                    alert("Ocurrió un error al intentar guardar.");
+                } finally {
+                    btn.textContent = "Guardar Joya en el Sistema";
+                    btn.disabled = false;
+                }
+            };
+        }
+    </script>
+</body>
+</html>
