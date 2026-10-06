@@ -85,9 +85,11 @@
                 <div class="bg-white rounded-xl shadow-sm border overflow-hidden flex flex-col justify-between transition hover:shadow-md">
                     <div>
                         <div class="relative h-64 bg-gray-100 overflow-hidden">
-                            <img src="${joya.imagen_url || 'https://via.placeholder.com/300'}" alt="${joya.nombre}" class="w-full h-full object-cover object-center">
-                            ${!joya.disponible ? '<span class="absolute top-2 right-2 bg-red-500 text-white text-[10px] uppercase font-bold px-2 py-0.5 rounded">Agotado</span>' : ''}
-                        </div>
+                        <a href="${joya.imagen_url || 'https://via.placeholder.com/300'}" target="_blank" title="Ver imagen en tamaño real">
+                        <img src="${joya.imagen_url || 'https://via.placeholder.com/300'}" alt="${joya.nombre}" class="w-full h-full object-cover object-center cursor-pointer hover:scale-105 transition duration-300">
+                        </a>
+                    ${!joya.disponible ? '<span class="absolute top-2 right-2 bg-red-500 text-white text-[10px] uppercase font-bold px-2 py-0.5 rounded">Agotado</span>' : ''}
+                    </div>
                         <div class="p-4">
                             <div class="text-[10px] uppercase tracking-wider text-gray-400 font-semibold mb-1">${joya.categoria || 'Accesorio'}</div>
                             <h3 class="font-medium text-gray-800 text-base mb-1">${joya.nombre}</h3>
